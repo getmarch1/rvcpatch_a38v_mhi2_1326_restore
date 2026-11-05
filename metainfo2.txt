@@ -53,7 +53,7 @@ VendorInfo = "Had"
 DeviceDescription = "RVCrestore"
 scriptPost = "./RVCrestore/tools/postscript.sh"
 scriptPostName = "post_script"
-scriptPostCheckSum = "AE3A607C2AB5BCD33CA5875A65F87FF5B86E9200"
+scriptPostCheckSum = "1D5D54A2AEE5E3866F05B6B013FCC489264CE988"
 scriptPostMaxTime = "300"
 
 [RVCrestore\version\0\default\File]
