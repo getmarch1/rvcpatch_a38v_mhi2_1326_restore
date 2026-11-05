@@ -1,7 +1,3 @@
-# rvcpatch_a38v_mhi2_1326_restore
-Restore Backups from rvcpatch_a38v_mhi2_1326 if something goes wrong...
-
-
 # Changelog – RVC-Restore (Audi A3 8V, MHI2_ER_AU37x_P5089_MU1326)
 
 Stellt die Originaldateien des RVC-Fullscreen-Patches aus den Sicherungen wieder her.
