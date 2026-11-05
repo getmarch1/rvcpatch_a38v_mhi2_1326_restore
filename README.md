@@ -5,7 +5,6 @@ Restore Backups from rvcpatch_a38v_mhi2_1326 if something goes wrong...
 # Changelog – RVC-Restore (Audi A3 8V, MHI2_ER_AU37x_P5089_MU1326)
 
 Stellt die Originaldateien des RVC-Fullscreen-Patches aus den Sicherungen wieder her.
-Nach jeder Änderung am `postscript.sh` muss `scriptPostCheckSum` in der `metainfo2.txt` neu berechnet werden.
 
 ## v0.09
 - Erfolgsbild \`04_erfolg.png\`: neuer Text „Das Gerät startet jetzt neu. Bitte im Anschluss die Rückdokumentation abbrechen.“ (zweizeilig). Der Hinweis zur SD-Karte entfällt.
