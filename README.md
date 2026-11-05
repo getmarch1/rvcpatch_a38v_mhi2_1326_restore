@@ -7,6 +7,29 @@ Restore Backups from rvcpatch_a38v_mhi2_1326 if something goes wrong...
 Stellt die Originaldateien des RVC-Fullscreen-Patches aus den Sicherungen wieder her.
 Nach jeder Änderung am `postscript.sh` muss `scriptPostCheckSum` in der `metainfo2.txt` neu berechnet werden.
 
+## v0.09
+- Erfolgsbild \`04_erfolg.png\`: neuer Text „Das Gerät startet jetzt neu. Bitte im Anschluss die Rückdokumentation abbrechen.“ (zweizeilig). Der Hinweis zur SD-Karte entfällt.
+- Script nur in der Versionsnummer geändert, neue Script-SHA1: \`1D5D54A2AEE5E3866F05B6B013FCC489264CE988\`
+
+## v0.08
+- **Statusbilder im Display** wie beim Patch-Paket (gleiche Anzeigefunktionen, gleiches Layout, 800×480): `01_pruefung`, `02_wiederherstellung`, `03_kontrolle`, `04_erfolg`, `05_fehler` und `06_keine_sicherung` im Ordner `RVCrestore/status/`. `SHOW_IMAGES=0` am Anfang des Scripts schaltet sie ab (danach `scriptPostCheckSum` neu berechnen). Fehler bei der Anzeige beeinflussen den Restore nie, die Gründe stehen als `[img]`-Zeilen im Log.
+- Eigenes Fehlerbild, wenn eine Sicherung fehlt (es wurde dann nichts verändert).
+- **Marker-Datei an den richtigen Ort verschoben:** `RVCrestore/version/0/default/RVCrestore` (wie im Patch-Paket `RVCpatch/version/0/default/RVCpatch`). Vorher lag sie in `RVCrestore/RVCrestore` und passte nicht zum Sektionsnamen der `metainfo2.txt`. Das war vermutlich die Ursache des `metainfo`-Fehlers.
+- `metainfo2.txt` jetzt 1:1 aus dem funktionierenden Patch-Paket abgeleitet (Zeilenenden wie dort, `[Signature]`-Block wieder enthalten, in v0.06 hatte ich ihn entfernt). Geändert sind nur die Namen und `scriptPostCheckSum`.
+- Prüfsummen-Verify sucht zusätzlich `/net/rcc/usr/bin/sha1sum` (wie beim Patch-Paket).
+- Log enthält jetzt Paketversion, Datum und Medium.
+- Script-SHA1: `6CD14DE6F2F1A2B14021D8B72CCE2D6B7596AE42`
+
+## v0.07
+- Verify arbeitet jetzt per Prüfsumme statt nur mit `cmp` (cmp fehlt auf manchen Units). Das Script nimmt das erste vorhandene Tool aus: `sha1sum`, `md5sum`, `cksum`, zuletzt `cmp`. Ist keines vorhanden, wird die Kontrolle übersprungen und im Log vermerkt.
+- Das verwendete Tool steht im Log (`Verify mit ...`). Bei einer abweichenden Datei bricht das Script wie bisher ab.
+- Neu: Ablaufdiagramm `docs/ablauf_restore.png`.
+- Script-SHA1: `7B6486E9B243A2EC7C5983D9A798458C5E77832E`
+
+## v0.06
+- `metainfo2.txt`: Der `[Signature]`-Block wurde entfernt. Die Signaturen stammten aus der kopierten Navi-Vorlage und passen nicht zum geänderten Inhalt. Die Signatur-/Variantenprüfung ist ohnehin über `skipCheckSignatureAndVariant = "true"` abgeschaltet.
+- Script, Marker-Datei und alle Prüfsummen unverändert (Script-SHA1: `AE3A607C2AB5BCD33CA5875A65F87FF5B86E9200`).
+
 ## v0.05
 - Entfernt: das Schreibbar-/Schreibgeschützt-Setzen von `SWDL_DIRS` (`hb_writable`, `hb_readonly`, `RO_MOUNTS`) aus v0.04. Der Installer arbeitet auch ohne Rechteänderung, daher nicht nötig.
 - Die Marker-Bereinigung aus v0.03 (`RVCpatch`, `RVCrestore`) bleibt unverändert erhalten und läuft weiterhin Best Effort.
