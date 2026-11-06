@@ -3,6 +3,8 @@
 Stellt die Originaldateien des RVC-Fullscreen-Patches aus den Sicherungen wieder her.
 Nach jeder Änderung am `postscript.sh` muss `scriptPostCheckSum` in der `metainfo2.txt` neu berechnet werden.
 
+Funktioniert NUR, wenn mit https://github.com/getmarch1/rvcpatch_a38v_mhi2_1326 gepatched wurde!
+
 Restore-Vorgang dauert ca. 8 Minuten! Vorgang nicht abbrechen - auch wenn der Bildschirm eine Weile schwarz ist!
 
 ## v0.12
