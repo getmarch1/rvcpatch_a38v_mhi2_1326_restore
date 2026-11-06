@@ -1,6 +1,18 @@
 # Changelog – RVC-Restore (Audi A3 8V, MHI2_ER_AU37x_P5089_MU1326)
 
 Stellt die Originaldateien des RVC-Fullscreen-Patches aus den Sicherungen wieder her.
+Nach jeder Änderung am `postscript.sh` muss `scriptPostCheckSum` in der `metainfo2.txt` neu berechnet werden.
+
+## v0.11
+- Der Marker dieses Restore-Pakets (`/HBpersistence/SWDL/RVCrestore`) wird nicht mehr gelöscht, nur noch der Marker des Patches (`RVCpatch`). Grund: Beim Test von v0.10 zeigte der SWDL nach einem sauberen Script-Lauf NOK und startete den Lauf erneut. Möglicherweise erwartet er seinen eigenen Marker nach dem Script. Das ist eine Vermutung und wird mit dieser Version getestet.
+- Zeitstempel im Log (`[zeit]`) nach Vorab-Prüfung, Wiederherstellung, Verify und Ende, um die Laufzeit der Schritte zu sehen (Grenze des SWDL: `scriptPostMaxTime = 300` Sekunden).
+- Script-SHA1: `5D9A6CE309222162CFFC45D451CF67A3A95AE973`
+
+## v0.10
+- Fix: Enthält ein Sicherungsordner (`..._original`) Unterordner, etwa durch frühere manuelle Kopierversuche, brach der Verify mit `FEHLER: Verify HMISystemEvoHighScale` ab, weil eine Prüfsumme über einen Ordner nicht möglich ist. Das Script kopiert und prüft jetzt nur noch Dateien. Unterordner werden übersprungen und im Log vermerkt (`Uebersprungen (keine Datei): ...`).
+- Ist eine Sicherung ohne Dateien, bricht das Script mit einer klaren Meldung ab. Das Log nennt die Anzahl der wiederhergestellten Dateien je Ordner.
+- Durch den Abbruch lief in v0.09 die Marker-Bereinigung nicht mehr. Mit v0.10 läuft sie wieder bis zum Ende durch.
+- Script-SHA1: `37B8051570EDA7B736D97DB2804DF221975D0BF5`
 
 ## v0.09
 - Erfolgsbild \`04_erfolg.png\`: neuer Text „Das Gerät startet jetzt neu. Bitte im Anschluss die Rückdokumentation abbrechen.“ (zweizeilig). Der Hinweis zur SD-Karte entfällt.
