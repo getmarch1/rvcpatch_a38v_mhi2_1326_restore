@@ -82,6 +82,5 @@ Restore-Vorgang dauert ca. 8 Minuten! Vorgang nicht abbrechen - auch wenn der Bi
 - Script-SHA1: `F7337F9DEBF9A894BAD527515BB92EF6C62F534D`
 
 ## Bekannte Einschränkungen
-- Ungetestet, Nutzung auf eigenes Risiko, vorher ein Backup anlegen.
+- Nutzung auf eigenes Risiko, vorher ein Backup anlegen.
 - Dateien, die der Patch neu angelegt hat und die im Original nicht existierten, werden nicht entfernt.
-- Ob das Löschen des `RVCrestore`-Markers wirkt, hängt von der Reihenfolge im Installer ab.
