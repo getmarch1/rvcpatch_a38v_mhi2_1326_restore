@@ -3,7 +3,7 @@
 # Stellt die Originaldateien aus den Sicherungen wieder her
 # ${2} = Wurzelverzeichnis des Update-Datentraegers (SD-Karte)
 
-PKG_VERSION="0.09"
+PKG_VERSION="0.11"
 SHOW_IMAGES=1        # 1 = Statusbilder im Display anzeigen, 0 = aus
 
 MEDIA=${2}
@@ -33,6 +33,9 @@ FAILIMG=05_fehler.png
 # ---------------------------------------------------------------- Logging
 
 log() { echo "$*" >> ${LOG}; }
+
+# Zeitstempel im Log (zeigt, wie lange die einzelnen Schritte dauern)
+stamp() { log "  [zeit] $1: $(date 2> /dev/null)"; }
 
 # ---------------------------------------------------------- Bildanzeige
 # Alles hier ist "best effort": Fehler duerfen den Restore nie beeinflussen.
@@ -160,6 +163,23 @@ same() {
     fi
 }
 
+# Dateien aus einer Sicherung zurueckkopieren; Unterordner (z.B. von frueheren
+# manuellen Versuchen) werden uebersprungen und im Log vermerkt
+# restore_dir <Sicherungsordner> <Zielordner> <Name fuers Log>
+restore_dir() {
+    n=0
+    for f in ${1}/*; do
+        if [ -f ${f} ]; then
+            cp ${f} ${2}/ || fail "Restore ${3}: ${f##*/}"
+            n=$((n + 1))
+        else
+            log "Uebersprungen (keine Datei): ${3}/${f##*/}"
+        fi
+    done
+    [ ${n} -gt 0 ] || fail "Sicherung enthaelt keine Dateien: ${1}"
+    log "${3} wiederhergestellt (${n} Dateien)"
+}
+
 # ------------------------------------------------------------------ Start
 
 # SD-Karte schreibbar, Autorun sofort umbenennen (verhindert Update-Schleife, auch bei Abbruch)
@@ -181,16 +201,17 @@ mount -uw ${APP} && mount -uw ${SYS} || fail "mount -uw app/system"
 [ -d ${IMG_DIR} ] || fail "Zielordner images fehlt: ${IMG_DIR}"
 [ -d ${KZB_DIR} ] || fail "Zielordner kzbs fehlt: ${KZB_DIR}"
 log "Vorab-Pruefungen ok"
+stamp "Vorab-Pruefungen"
 
 # 2. Wiederherstellen (Sicherungen bleiben erhalten)
 show_image 02_wiederherstellung.png
 cp ${DM_DIR}/displaymanager.json.original ${DM_DIR}/displaymanager.json || fail "Restore displaymanager.json"
 log "displaymanager.json wiederhergestellt"
-cp ${IMG_DIR}_original/* ${IMG_DIR}/ || fail "Restore images"
-log "images wiederhergestellt"
-cp ${KZB_DIR}_original/* ${KZB_DIR}/ || fail "Restore kzbs"
-log "kzbs wiederhergestellt"
+restore_dir ${IMG_DIR}_original ${IMG_DIR} images
+restore_dir ${KZB_DIR}_original ${KZB_DIR} kzbs
 sync
+
+stamp "Wiederherstellung"
 
 # 3. Kontrolle per Pruefsumme
 show_image 03_kontrolle.png
@@ -198,9 +219,11 @@ if [ -n "${SUMTOOL}" ]; then
     log "Verify mit ${SUMTOOL}"
     same ${DM_DIR}/displaymanager.json.original ${DM_DIR}/displaymanager.json || fail "Verify displaymanager.json"
     for f in ${IMG_DIR}_original/*; do
+        [ -f ${f} ] || continue
         same ${f} ${IMG_DIR}/${f##*/} || fail "Verify ${f##*/}"
     done
     for f in ${KZB_DIR}_original/*; do
+        [ -f ${f} ] || continue
         same ${f} ${KZB_DIR}/${f##*/} || fail "Verify ${f##*/}"
     done
     log "Verify ok"
@@ -208,21 +231,22 @@ else
     log "kein Pruefsummen-Tool vorhanden, Verify uebersprungen"
 fi
 
-# SWDL-Installationsmarker bereinigen, damit der Patch erneut installiert werden kann
-# (Best effort: ein Fehler hier bricht den Restore nicht ab)
+stamp "Verify"
+
+# Marker des Patches entfernen, damit der Patch erneut installiert werden kann.
+# Der Marker dieses Restore-Pakets (RVCrestore) wird absichtlich NICHT angefasst,
+# er gehoert dem SWDL. (Best effort: ein Fehler hier bricht den Restore nicht ab)
 for d in ${SWDL_DIRS}; do
     [ -d ${d} ] || continue
-    for m in RVCpatch RVCrestore; do
-        if [ -e ${d}/${m} ]; then
-            if rm -rf ${d}/${m}; then
-                log "Marker entfernt: ${d}/${m}"
-            else
-                log "WARNUNG: Marker konnte nicht entfernt werden: ${d}/${m}"
-            fi
+    if [ -e ${d}/RVCpatch ]; then
+        if rm -rf ${d}/RVCpatch; then
+            log "Marker entfernt: ${d}/RVCpatch"
         else
-            log "Marker nicht vorhanden: ${d}/${m}"
+            log "WARNUNG: Marker konnte nicht entfernt werden: ${d}/RVCpatch"
         fi
-    done
+    else
+        log "Marker nicht vorhanden: ${d}/RVCpatch"
+    fi
 done
 sync
 
@@ -230,6 +254,7 @@ sync
 sync
 mount -ur ${APP} && mount -ur ${SYS} || log "WARNUNG: mount -ur app/system fehlgeschlagen"
 
+stamp "Ende"
 log "=== RVC-Restore erfolgreich ==="
 show_image 04_erfolg.png
 sync
