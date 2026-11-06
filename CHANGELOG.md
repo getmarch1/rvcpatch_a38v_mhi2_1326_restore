@@ -3,6 +3,11 @@
 Stellt die Originaldateien des RVC-Fullscreen-Patches aus den Sicherungen wieder her.
 Nach jeder Änderung am `postscript.sh` muss `scriptPostCheckSum` in der `metainfo2.txt` neu berechnet werden.
 
+## v0.12
+- Die Marker-Bereinigung unter `/HBpersistence/SWDL` ist komplett entfernt (auch `RVCpatch`). Beim Test von v0.11 zeigte die Zusammenfassung des SWDL `RVCpatch` als `[NOK]`, den Eintrag, dessen Marker das Script gelöscht hatte. Die Marker werden jetzt nicht mehr angefasst. Die Variable `SWDL_DIRS` entfällt.
+- Der Patch lässt sich nach dem Restore trotzdem erneut installieren (Marker sind dafür nicht nötig).
+- Script-SHA1: `BAE02CA9144923CCA7A7D6FDBB0FF183E5744759`
+
 ## v0.11
 - Der Marker dieses Restore-Pakets (`/HBpersistence/SWDL/RVCrestore`) wird nicht mehr gelöscht, nur noch der Marker des Patches (`RVCpatch`). Grund: Beim Test von v0.10 zeigte der SWDL nach einem sauberen Script-Lauf NOK und startete den Lauf erneut. Möglicherweise erwartet er seinen eigenen Marker nach dem Script. Das ist eine Vermutung und wird mit dieser Version getestet.
 - Zeitstempel im Log (`[zeit]`) nach Vorab-Prüfung, Wiederherstellung, Verify und Ende, um die Laufzeit der Schritte zu sehen (Grenze des SWDL: `scriptPostMaxTime = 300` Sekunden).

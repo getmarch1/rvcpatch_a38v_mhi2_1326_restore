@@ -3,7 +3,7 @@
 # Stellt die Originaldateien aus den Sicherungen wieder her
 # ${2} = Wurzelverzeichnis des Update-Datentraegers (SD-Karte)
 
-PKG_VERSION="0.11"
+PKG_VERSION="0.12"
 SHOW_IMAGES=1        # 1 = Statusbilder im Display anzeigen, 0 = aus
 
 MEDIA=${2}
@@ -14,7 +14,6 @@ DM_DIR=${SYS}/etc/eso/production
 IMG_DIR=${APP}/eso/hmi/lsd/images/HMIEarlyAppsEvoHighScale
 KZB_DIR=${APP}/eso/hmi/lsd/kzbs/HMISystemEvoHighScale
 LOG=${MEDIA}/rvcrestore.log
-SWDL_DIRS="/HBpersistence/SWDL /net/mmx/HBpersistence/SWDL"
 
 # Systemprogramme fuer die Bildanzeige
 IMGBIN=/net/mmx/eso/bin/apps/loadandshowimage
@@ -233,22 +232,8 @@ fi
 
 stamp "Verify"
 
-# Marker des Patches entfernen, damit der Patch erneut installiert werden kann.
-# Der Marker dieses Restore-Pakets (RVCrestore) wird absichtlich NICHT angefasst,
-# er gehoert dem SWDL. (Best effort: ein Fehler hier bricht den Restore nicht ab)
-for d in ${SWDL_DIRS}; do
-    [ -d ${d} ] || continue
-    if [ -e ${d}/RVCpatch ]; then
-        if rm -rf ${d}/RVCpatch; then
-            log "Marker entfernt: ${d}/RVCpatch"
-        else
-            log "WARNUNG: Marker konnte nicht entfernt werden: ${d}/RVCpatch"
-        fi
-    else
-        log "Marker nicht vorhanden: ${d}/RVCpatch"
-    fi
-done
-sync
+# Hinweis: Die SWDL-Marker unter /HBpersistence/SWDL (RVCpatch, RVCrestore) werden
+# absichtlich nicht angefasst, sonst zeigt der SWDL in der Zusammenfassung NOK.
 
 # Partitionen wieder schreibgeschuetzt
 sync
