@@ -7,6 +7,10 @@ Funktioniert NUR, wenn mit https://github.com/getmarch1/rvcpatch_a38v_mhi2_1326 
 
 Restore-Vorgang dauert ca. 8 Minuten! Vorgang nicht abbrechen - auch wenn der Bildschirm eine Weile schwarz ist!
 
+Nach der Installation muss der Fehlercode 1555 - Softwareversionsmanagement prüfen gefixt werden. 
+Nutze hierfür https://mib-helper.com/im-so-xory/ oder https://dias-automotive-engineering.com/fix-for-software-version-management-svm-fault-1555-b201a/
+mit VCDS, ODIS, OBD11 etc.
+
 ## v0.12
 - Die Marker-Bereinigung unter `/HBpersistence/SWDL` ist komplett entfernt (auch `RVCpatch`). Beim Test von v0.11 zeigte die Zusammenfassung des SWDL `RVCpatch` als `[NOK]`, den Eintrag, dessen Marker das Script gelöscht hatte. Die Marker werden jetzt nicht mehr angefasst. Die Variable `SWDL_DIRS` entfällt.
 - Der Patch lässt sich nach dem Restore trotzdem erneut installieren (Marker sind dafür nicht nötig).
