@@ -3,6 +3,12 @@
 Stellt die Originaldateien des RVC-Fullscreen-Patches aus den Sicherungen wieder her.
 Nach jeder Änderung am `postscript.sh` muss `scriptPostCheckSum` in der `metainfo2.txt` neu berechnet werden.
 
+## v0.13
+- Das Script kopiert nur noch Dateien, die vom Zielordner abweichen (Prüfsummen-Vergleich vorab). Unveränderte Dateien werden nicht neu geschrieben. Bisher wurden immer alle rund 150 Dateien der Sicherungen (Bilder und KZBs) zurückgeschrieben, obwohl der Patch nur etwa 20 geändert hat. Das sollte die Laufzeit und die Schreibzugriffe auf den Flash verringern. Ob dadurch auch der Neustart danach kürzer wird, ist eine Vermutung (denkbar: Caches, die an Dateizeitstempeln hängen).
+- Die Kontrolle prüft nur noch die tatsächlich kopierten Dateien. Ohne Prüfsummen-Tool werden wie bisher alle Dateien kopiert.
+- Das Log nennt je Ordner: Dateien in der Sicherung, kopiert, unverändert, und führt die kopierten Dateien einzeln auf (`kopiert: ...`).
+- Script-SHA1: `2E4DD384F715CB349D9AEF34B0561D6A19D88A10`
+
 ## v0.12
 - Die Marker-Bereinigung unter `/HBpersistence/SWDL` ist komplett entfernt (auch `RVCpatch`). Beim Test von v0.11 zeigte die Zusammenfassung des SWDL `RVCpatch` als `[NOK]`, den Eintrag, dessen Marker das Script gelöscht hatte. Die Marker werden jetzt nicht mehr angefasst. Die Variable `SWDL_DIRS` entfällt.
 - Der Patch lässt sich nach dem Restore trotzdem erneut installieren (Marker sind dafür nicht nötig).

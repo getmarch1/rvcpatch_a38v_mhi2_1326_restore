@@ -3,7 +3,7 @@
 # Stellt die Originaldateien aus den Sicherungen wieder her
 # ${2} = Wurzelverzeichnis des Update-Datentraegers (SD-Karte)
 
-PKG_VERSION="0.12"
+PKG_VERSION="0.13"
 SHOW_IMAGES=1        # 1 = Statusbilder im Display anzeigen, 0 = aus
 
 MEDIA=${2}
@@ -162,21 +162,36 @@ same() {
     fi
 }
 
-# Dateien aus einer Sicherung zurueckkopieren; Unterordner (z.B. von frueheren
-# manuellen Versuchen) werden uebersprungen und im Log vermerkt
+# Dateien aus einer Sicherung zurueckkopieren, aber nur die, die vom Ziel abweichen
+# (weniger Schreibzugriffe auf den Flash, unveraenderte Dateien behalten ihren Zeitstempel).
+# Unterordner (z.B. von frueheren manuellen Versuchen) werden uebersprungen.
+# Ohne Pruefsummen-Tool werden alle Dateien kopiert.
+# Kopierte Dateien landen als "Quelle:Ziel" in COPIED, fuer die spaetere Kontrolle.
+COPIED=""
+
 # restore_dir <Sicherungsordner> <Zielordner> <Name fuers Log>
 restore_dir() {
     n=0
+    kopiert=0
+    gleich=0
     for f in ${1}/*; do
         if [ -f ${f} ]; then
-            cp ${f} ${2}/ || fail "Restore ${3}: ${f##*/}"
             n=$((n + 1))
+            t=${2}/${f##*/}
+            if [ -n "${SUMTOOL}" ] && [ -f ${t} ] && same ${f} ${t}; then
+                gleich=$((gleich + 1))
+            else
+                cp ${f} ${2}/ || fail "Restore ${3}: ${f##*/}"
+                kopiert=$((kopiert + 1))
+                COPIED="${COPIED} ${f}:${t}"
+                log "  kopiert: ${3}/${f##*/}"
+            fi
         else
             log "Uebersprungen (keine Datei): ${3}/${f##*/}"
         fi
     done
     [ ${n} -gt 0 ] || fail "Sicherung enthaelt keine Dateien: ${1}"
-    log "${3} wiederhergestellt (${n} Dateien)"
+    log "${3}: ${n} Dateien in der Sicherung, ${kopiert} kopiert, ${gleich} unveraendert"
 }
 
 # ------------------------------------------------------------------ Start
@@ -204,26 +219,25 @@ stamp "Vorab-Pruefungen"
 
 # 2. Wiederherstellen (Sicherungen bleiben erhalten)
 show_image 02_wiederherstellung.png
-cp ${DM_DIR}/displaymanager.json.original ${DM_DIR}/displaymanager.json || fail "Restore displaymanager.json"
-log "displaymanager.json wiederhergestellt"
+if [ -n "${SUMTOOL}" ] && same ${DM_DIR}/displaymanager.json.original ${DM_DIR}/displaymanager.json; then
+    log "displaymanager.json: unveraendert"
+else
+    cp ${DM_DIR}/displaymanager.json.original ${DM_DIR}/displaymanager.json || fail "Restore displaymanager.json"
+    COPIED="${COPIED} ${DM_DIR}/displaymanager.json.original:${DM_DIR}/displaymanager.json"
+    log "displaymanager.json: wiederhergestellt"
+fi
 restore_dir ${IMG_DIR}_original ${IMG_DIR} images
 restore_dir ${KZB_DIR}_original ${KZB_DIR} kzbs
 sync
 
 stamp "Wiederherstellung"
 
-# 3. Kontrolle per Pruefsumme
+# 3. Kontrolle per Pruefsumme (nur die kopierten Dateien)
 show_image 03_kontrolle.png
 if [ -n "${SUMTOOL}" ]; then
     log "Verify mit ${SUMTOOL}"
-    same ${DM_DIR}/displaymanager.json.original ${DM_DIR}/displaymanager.json || fail "Verify displaymanager.json"
-    for f in ${IMG_DIR}_original/*; do
-        [ -f ${f} ] || continue
-        same ${f} ${IMG_DIR}/${f##*/} || fail "Verify ${f##*/}"
-    done
-    for f in ${KZB_DIR}_original/*; do
-        [ -f ${f} ] || continue
-        same ${f} ${KZB_DIR}/${f##*/} || fail "Verify ${f##*/}"
+    for pair in ${COPIED}; do
+        same ${pair%%:*} ${pair##*:} || fail "Verify ${pair##*/}"
     done
     log "Verify ok"
 else
