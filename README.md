@@ -3,13 +3,13 @@
 Stellt die Originaldateien des RVC-Fullscreen-Patches aus den Sicherungen wieder her.
 Nach jeder Änderung am `postscript.sh` muss `scriptPostCheckSum` in der `metainfo2.txt` neu berechnet werden.
 
-Funktioniert NUR, wenn mit https://github.com/getmarch1/rvcpatch_a38v_mhi2_1326 gepatched wurde!
+Nach der Installation muss der Fehlercode 1555 - Softwareversionsmanagement prüfen gefixt werden. Nutze hierfür https://mib-helper.com/im-so-xory/ oder https://dias-automotive-engineering.com/fix-for-software-version-management-svm-fault-1555-b201a/ mit VCDS, ODIS, OBD11 etc.
 
-Restore-Vorgang dauert ca. 8 Minuten! Vorgang nicht abbrechen - auch wenn der Bildschirm eine Weile schwarz ist!
-
-Nach der Installation muss der Fehlercode 1555 - Softwareversionsmanagement prüfen gefixt werden. 
-Nutze hierfür https://mib-helper.com/im-so-xory/ oder https://dias-automotive-engineering.com/fix-for-software-version-management-svm-fault-1555-b201a/
-mit VCDS, ODIS, OBD11 etc.
+## v0.13
+- Das Script kopiert nur noch Dateien, die vom Zielordner abweichen (Prüfsummen-Vergleich vorab). Unveränderte Dateien werden nicht neu geschrieben. Bisher wurden immer alle rund 150 Dateien der Sicherungen (Bilder und KZBs) zurückgeschrieben, obwohl der Patch nur etwa 20 geändert hat. Das sollte die Laufzeit und die Schreibzugriffe auf den Flash verringern. Ob dadurch auch der Neustart danach kürzer wird, ist eine Vermutung (denkbar: Caches, die an Dateizeitstempeln hängen).
+- Die Kontrolle prüft nur noch die tatsächlich kopierten Dateien. Ohne Prüfsummen-Tool werden wie bisher alle Dateien kopiert.
+- Das Log nennt je Ordner: Dateien in der Sicherung, kopiert, unverändert, und führt die kopierten Dateien einzeln auf (`kopiert: ...`).
+- Script-SHA1: `2E4DD384F715CB349D9AEF34B0561D6A19D88A10`
 
 ## v0.12
 - Die Marker-Bereinigung unter `/HBpersistence/SWDL` ist komplett entfernt (auch `RVCpatch`). Beim Test von v0.11 zeigte die Zusammenfassung des SWDL `RVCpatch` als `[NOK]`, den Eintrag, dessen Marker das Script gelöscht hatte. Die Marker werden jetzt nicht mehr angefasst. Die Variable `SWDL_DIRS` entfällt.
@@ -88,5 +88,6 @@ mit VCDS, ODIS, OBD11 etc.
 - Script-SHA1: `F7337F9DEBF9A894BAD527515BB92EF6C62F534D`
 
 ## Bekannte Einschränkungen
-- Nutzung auf eigenes Risiko, vorher ein Backup anlegen.
+- Ungetestet, Nutzung auf eigenes Risiko, vorher ein Backup anlegen.
 - Dateien, die der Patch neu angelegt hat und die im Original nicht existierten, werden nicht entfernt.
+- Ob das Löschen des `RVCrestore`-Markers wirkt, hängt von der Reihenfolge im Installer ab.
